@@ -3,7 +3,7 @@
 ## Interface-Classic: 11404
 ## Version: @project-version@
 ## Title: WaryrSpeak
-## Notes: Changes voice to make you talk as though you have no jaw. Enjoy <3
+## Notes: Changes text to simulate having no jaw. Made my Elfyr / Waryr - Chaos Bolt
 ## Author: Elfyr
 ## X-Curse-Project-ID: 945317
 
