@@ -2,20 +2,28 @@ local gluks = {
 	"ckk!",
 	"gluk!",
 	"slp.",
-	"slp~slp~slp",
-	"^w^",
-	">w<",
+	"slp~slp~slp"
+	"*bleh!*",
 }
 
+-- Turning false many areas, including whispers
 local defaults = {
 	enabled = true,
-	guild = true,
-	officer = true,
-	whisper = true,
+	guild = false,
+	officer = false,
+	whisper = false,
 }
 
+-- Default blocking many popular channels where RP doesn't occur.
 local blockedChannelsDefaults = {
 	"NewcomerChat",
+	"Raid",
+	"LookingForGroup",
+	"Trade",
+	"General",
+	"GuildRecruitment",
+	"LocalDefense",
+	"WorldDefense",
 }
 
 local db
@@ -91,73 +99,57 @@ function SendChatMessage(msg, chatType, language, channel)
 		return
 	end
 
+	-- if/then for if msg starts with "/e" to not effect emotes.
+	-- need to add: (and string.sub(msg,1,2) ~= "/e")
 	if ShouldGluk(chatType) and ShouldGlukTwo(chatType, channel) then
 		wipe(hyperlinks)
 
 		local gluk = gluks[random(#gluks)]
+		local rng = random(5)
 		local s = msg:gsub("|c.-|r", ReplaceLink)
-
+		
 		s = s:gsub("{.-}", ReplaceLink)
 
-		-- Trying to do if there's too many "o"'s then gluk
+		-- Alternating some O's to make it look a bit forced?
 		s = s:gsub("([lr])([%S]*s?)", function(l, following)
 		    if l == 'o' and following == 'o' then
-		        return 'o' .. following
+		        return 'O' .. following
 		    elseif l == 'O' and following == 'o' then
 		        return 'O' .. following
 		    else
-		        return 'gluk!' .. following
+		        return 'O' .. following
 		    end
 		end)
 
-		-- Letter Replacements
-		s = s:gsub("b " , "eh ")
-		s = s:gsub("B " , "Eh ")
-		s = s:gsub("c " , "he ")
-		s = s:gsub("C " , "He ")
-		s = s:gsub("d " , "e ")
-		s = s:gsub("D " , "EE ")
-		s = s:gsub("F " , "Euhf ")
-		s = s:gsub("f " , "uf ")
-		s = s:gsub("g " , "gk ")
-		s = s:gsub("G " , "Gk ")
-		s = s:gsub("i " , "ay ")
-		s = s:gsub("I " , "Ay ")
-		s = s:gsub("j " , "a ")
-		s = s:gsub("J " , "A ")
-		s = s:gsub("l " , "el ")
-		s = s:gsub("L " , "EL ")
-		s = s:gsub("m " , "ev ")
-		s = s:gsub("M " , "EV ")
-		s = s:gsub("n " , "en ")
-		s = s:gsub("o " , "ogg ")
-		s = s:gsub("O " , "UH! ")
-		s = s:gsub("p " , "l~ ")
-		s = s:gsub("P " , " ")
-		s = s:gsub("r " , "er ")
-		s = s:gsub("R " , "ER ")
-		s = s:gsub("s " , "h ")
-		s = s:gsub("S " , "H ")
-		s = s:gsub("t " , "hh ")
-		s = s:gsub("T " , " ")
-		s = s:gsub("v " , "eeh ")
-		s = s:gsub("V " , "EEH ")
-		s = s:gsub("w " , "hhng ")
-		s = s:gsub("W " , "~! ")
-		s = s:gsub("x " , "ek ")
-		s = s:gsub("X " , "EK ")
-		s = s:gsub("y " , "ay ")
-		s = s:gsub("Y " , "UU ")
-		s = s:gsub("z " , "g ")
-		s = s:gsub("Z " , "G ")
-		s = s:gsub(" th", " hg") or s
+		-- Letter Replacements Which are Random
+		if rng == 4 then
+			s = s:gsub("F" , "EF")
+			s = s:gsub("f" , "ef")
+			s = s:gsub("s" , "h")
+			s = s:gsub("S" , "H")
+			s = s:gsub("t " , "gh")
+			s = s:gsub("T " , "GH")
+		end
+
+		s = s:gsub("c " , "k ")
+		s = s:gsub("C " , "K ")
+		s = s:gsub("j" , "jh")
+		s = s:gsub("J" , "JH")
+		s = s:gsub("p " , "lp ")
+		s = s:gsub("P " , "Lp ")
+		s = s:gsub("v " , "e ")
+		s = s:gsub("V " , "E ")
+		s = s:gsub("w" , "r")
+		s = s:gsub("W" , "R")
+		s = s:gsub("w " , "r ")
+		s = s:gsub("W " , "R ")
 
 		-- Reformats as string, I think?
 		s = format(" %s ", s)
 
 		-- Adds stutter on first character randomly:
 		for k in gmatch(s, "%a+") do
-			if random(6) == 1 then
+			if random(6) == 2 then
 				local firstChar = k:sub(1, 1)
 				s = s:gsub(format(" %s ", k), format(" %s-%s ", firstChar, k))
 			end
@@ -165,7 +157,10 @@ function SendChatMessage(msg, chatType, language, channel)
 
 		-- Trims up data and pushes out the function for game:
 		s = s:trim()
-		s = #s <= 255 and s:gsub("gluk%d", RestoreLink) or msg
+
+		-- Inserts the random "glucks" (renamed object "gluk")
+		s = rng == 1 and s.." "..gluk or s:gsub("!$", " "..gluk)
+		s = #s <= 500 and s:gsub("gluk%d", RestoreLink) or msg
 		makegluk(s, chatType, language, channel)
 	else
 		makegluk(msg, chatType, language, channel)
