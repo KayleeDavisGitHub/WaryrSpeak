@@ -99,8 +99,11 @@ function SendChatMessage(msg, chatType, language, channel)
 		return
 	end
 
-	-- if/then for if msg starts with "/e" to not effect emotes.
-	-- need to add: (and string.sub(msg,1,2) ~= "/e")
+	-- if Emote, then return it and end.
+	if CHAT_MSG_EMOTE then
+		return
+	end
+
 	if ShouldGluk(chatType) and ShouldGlukTwo(chatType, channel) then
 		wipe(hyperlinks)
 
@@ -120,16 +123,6 @@ function SendChatMessage(msg, chatType, language, channel)
 		        return 'O' .. following
 		    end
 		end)
-
-		-- Letter Replacements Which are Random
-		if rng == 4 then
-			s = s:gsub("F" , "EF")
-			s = s:gsub("f" , "ef")
-			s = s:gsub("s" , "h")
-			s = s:gsub("S" , "H")
-			s = s:gsub("t " , "gh")
-			s = s:gsub("T " , "GH")
-		end
 
 		s = s:gsub("c " , "k ")
 		s = s:gsub("C " , "K ")
@@ -169,8 +162,8 @@ end
 
 -- Enabled/Disabled Messaging:
 local EnabledMsg = {
-	[true] = "|cffADFF2FGlukablled|r",
-	[false] = "|cffFF2424Glikablled|r",
+	[true] = "|cffADFF2FEnabled|r",
+	[false] = "|cffFF2424Disabled|r",
 }
 
 local function PrintMessage(msg)
