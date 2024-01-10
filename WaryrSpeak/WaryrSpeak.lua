@@ -2,8 +2,9 @@ local gluks = {
 	"ckk!",
 	"gluk!",
 	"slp.",
-	"slp~slp~slp"
+	"slp~slp~slp",
 	"*bleh!*",
+	"*weezing noise*",
 }
 
 -- Turning false many areas, including whispers
@@ -32,6 +33,7 @@ local hyperlinks = {}
 
 local function OnEvent(self, event, addon)
 	if addon == "WaryrSpeak" then
+		print("WaryrSpeak Loaded! Use /Waryrspeak to disable.")
 		WaryrSpeakDB = WaryrSpeakDB or CopyTable(defaults)
 		WaryrSpeakDBBlockedChannels = WaryrSpeakDBBlockedChannels or CopyTable(blockedChannelsDefaults)
 		blockedChannels = WaryrSpeakDBBlockedChannels
@@ -82,31 +84,39 @@ local function ShouldGlukTwo(chatType, channel)
 
 		for key, value in pairs(blockedChannels) do
 			if channelName == value then
-				-- print("Found " .. channelName .. " in blockedChannels table.  Do not gluk")
+				--print("Found " .. channelName .. " in blockedChannels table.  Do not gluk")
 				return false
 			end
 		end
 	end
-	-- print("Did not find " .. channelName .. " in blockedChannels table.  gluk away!")
+	--print("Did not find " .. channelName .. " in blockedChannels table.  gluk away!")
 	return true
 end
 
 local makegluk = SendChatMessage
 
 function SendChatMessage(msg, chatType, language, channel)
+	--print("SendChatMessage called!")
 
+	-- Removing Emote use
 	if chatType == "EMOTE" then
 		makegluk(msg, chatType, language, channel)
 		return
 	end
-
-	-- if Emote, then return it and end.
-	--if CHAT_MSG_EMOTE then
-	--	return
-	--end
+	-- removing Raid use
+	if chatType == "RAID" then
+		makegluk(msg, chatType, language, channel)
+		return
+	end
+	-- idk if this is a real thing, but /etrace made it seem like it was
+	if chatType == "RAID_LEADER" then
+		makegluk(msg, chatType, language, channel)
+		return
+	end
 
 	if ShouldGluk(chatType) and ShouldGlukTwo(chatType, channel) then
 		wipe(hyperlinks)
+		--print("ShouldGluk condition met!")
 
 		local gluk = gluks[random(#gluks)]
 		local rng = random(5)
@@ -114,16 +124,16 @@ function SendChatMessage(msg, chatType, language, channel)
 		
 		s = s:gsub("{.-}", ReplaceLink)
 
-		-- Alternating some O's to make it look a bit forced?
-		s = s:gsub("([lr])([%S]*s?)", function(l, following)
-		    if l == 'o' and following == 'o' then
-		        return 'O' .. following
-		    elseif l == 'O' and following == 'o' then
-		        return 'O' .. following
-		    else
-		        return 'O' .. following
-		    end
-		end)
+		-- Logic for replacing r's
+		--s = s:gsub("([r])([%S]*s?)", function(l, following)
+		--    if l == 'o' and following == 'o' then
+		--        return 'O' .. following
+		--    elseif l == 'O' and following == 'o' then
+		--        return 'O' .. following
+		--    else
+		--        return 'O' .. following
+		--    end
+		--end)
 
 		s = s:gsub("c " , "k ")
 		s = s:gsub("C " , "K ")
@@ -242,4 +252,3 @@ SlashCmdList.WaryrSPEAK = function(msg)
 		PrintMessage(EnabledMsg[db.enabled])
 	end
 end
-
