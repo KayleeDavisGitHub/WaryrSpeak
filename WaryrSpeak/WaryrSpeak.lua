@@ -95,14 +95,15 @@ local makegluk = SendChatMessage
 
 function SendChatMessage(msg, chatType, language, channel)
 
-	if msg == "GHI2ChannelReadyCheck" then
+	if chatType == "EMOTE" then
+		makegluk(msg, chatType, language, channel)
 		return
 	end
 
 	-- if Emote, then return it and end.
-	if CHAT_MSG_EMOTE then
-		return
-	end
+	--if CHAT_MSG_EMOTE then
+	--	return
+	--end
 
 	if ShouldGluk(chatType) and ShouldGlukTwo(chatType, channel) then
 		wipe(hyperlinks)
@@ -241,3 +242,4 @@ SlashCmdList.WaryrSPEAK = function(msg)
 		PrintMessage(EnabledMsg[db.enabled])
 	end
 end
+
